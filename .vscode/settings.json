@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Voyage Space Game.sln"
+    "dotnet.defaultSolution": "Voyage-Space-Game.sln"
 }
