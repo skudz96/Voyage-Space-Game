@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 public class Movement : MonoBehaviour
-{ // test
+{
     private Rigidbody rb; 
     [SerializeField] private float thrustSpeed = 1250f;
     [SerializeField] private float rotateSpeed = 60f;
