@@ -2,21 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
-    private Rigidbody rb; 
+    // PARAMETERS - for tuning, typically set in the editor
     [SerializeField] private float thrustSpeed = 1250f;
     [SerializeField] private float rotateSpeed = 60f;
+    [SerializeField] private AudioClip mainEngine;
     
+    [SerializeField] private ParticleSystem leftBooster;
+    [SerializeField] private ParticleSystem rightBooster;
+    [SerializeField] private ParticleSystem mainBooster;
+    
+    // CACHE - e.g. references for readability or speed
+    private Rigidbody rb; 
     private AudioSource audioSource;
+    
+    // STATE - private instance (member) variables
     
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
-
     }
 
     // Update is called once per frame
@@ -31,9 +40,18 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(KeyCode.Space))
         { 
             rb.AddRelativeForce(Vector3.up * (thrustSpeed * Time.deltaTime));
-            if (!audioSource.isPlaying)
+            if (!mainBooster.isPlaying)
+            { 
+                mainBooster.Play();
+            }
+            else
             {
-                audioSource.Play();
+                mainBooster.Stop();
+            }
+            
+            if (!audioSource.isPlaying)
+            { 
+                audioSource.PlayOneShot(mainEngine);
             }
             else
             {
@@ -47,10 +65,23 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             ApplyRotation(rotateSpeed);
+            if (!rightBooster.isPlaying)
+            {
+                rightBooster.Play();
+            }
         }
         else if (Input.GetKey(KeyCode.D))
         {
             ApplyRotation(-rotateSpeed);
+            if (!leftBooster.isPlaying)
+            {
+                leftBooster.Play();
+            }
+        }
+        else
+        {
+            rightBooster.Stop();
+            leftBooster.Stop();
         }
     }
     // Rotation simplified into a METHOD called ApplyRotation, can use this method in ProcessRotation to simplify code
