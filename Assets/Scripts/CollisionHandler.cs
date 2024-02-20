@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,15 +19,21 @@ public class CollisionHandler : MonoBehaviour
     
     // STATE
     private bool isTransitioning = false;
+    bool CollisionDisabled = false;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
     }
 
+    private void Update() 
+    {
+        DebugCheat();
+    }
+
     void OnCollisionEnter(Collision other)
     {
-        if (isTransitioning) {return;}
+        if (isTransitioning || CollisionDisabled) {return;} // || means OR
         switch (other.gameObject.tag)
         {
             case "Friendly":
@@ -70,14 +75,12 @@ public class CollisionHandler : MonoBehaviour
     private void ReloadLevel()
     {
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        if (currentSceneIndex >= 1)
-        {
-            SceneManager.LoadScene(currentSceneIndex = 0);
-        }
-        else
-        {
+        //if (currentSceneIndex >= 1)
+        
+           // SceneManager.LoadScene(currentSceneIndex = 0);
+        
             SceneManager.LoadScene(currentSceneIndex);
-        }
+    
     }
 
     private void NextLevel()
@@ -89,6 +92,20 @@ public class CollisionHandler : MonoBehaviour
             nextSceneIndex = 0;
         }
         SceneManager.LoadScene(nextSceneIndex);
+    }
+
+      private void DebugCheat()
+    {
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            NextLevel();
+        }
+
+         if(Input.GetKeyDown(KeyCode.C)) 
+        {
+           CollisionDisabled = !CollisionDisabled; // Making a basic toggle
+        }
+        
     }
 
 }

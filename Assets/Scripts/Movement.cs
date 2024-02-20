@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public class Movement : MonoBehaviour
 {
     // PARAMETERS - for tuning, typically set in the editor
-    [SerializeField] private float thrustSpeed = 1250f;
+    [SerializeField] private float thrustSpeed = 300f;
     [SerializeField] private float rotateSpeed = 60f;
     [SerializeField] private AudioClip mainEngine;
     
@@ -18,6 +18,7 @@ public class Movement : MonoBehaviour
     // CACHE - e.g. references for readability or speed
     private Rigidbody rb; 
     private AudioSource audioSource;
+   
     
     // STATE - private instance (member) variables
     
@@ -29,7 +30,7 @@ public class Movement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         ProcessThrust();
         ProcessRotation();
@@ -38,52 +39,70 @@ public class Movement : MonoBehaviour
     void ProcessThrust()
     {
         if (Input.GetKey(KeyCode.Space))
-        { 
-            rb.AddRelativeForce(Vector3.up * (thrustSpeed * Time.deltaTime));
-            if (!mainBooster.isPlaying)
-            { 
-                mainBooster.Play();
-            }
-            else
-            {
-                mainBooster.Stop();
-            }
-            
-            if (!audioSource.isPlaying)
-            { 
-                audioSource.PlayOneShot(mainEngine);
-            }
-            else
-            {
-                audioSource.Stop();
-            }
-        }
-    }
-
-    void ProcessRotation()
-    {
-        if (Input.GetKey(KeyCode.A))
         {
-            ApplyRotation(rotateSpeed);
-            if (!rightBooster.isPlaying)
-            {
-                rightBooster.Play();
-            }
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            ApplyRotation(-rotateSpeed);
-            if (!leftBooster.isPlaying)
-            {
-                leftBooster.Play();
-            }
+            StartThrusting();
         }
         else
         {
-            rightBooster.Stop();
-            leftBooster.Stop();
+            StopThrusting();
         }
     }
+     private void ProcessRotation()
+    {
+        if (Input.GetKey(KeyCode.D))
+        {
+            RotateLeft();
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            RotateRight();
+        }
+        else
+        {
+            StopRotating();
+        }
+    }
+
+     private void StartThrusting()
+    {
+        rb.AddRelativeForce(Vector3.up * (thrustSpeed * Time.deltaTime));
+        if (!mainBooster.isPlaying)
+        {
+            mainBooster.Play();
+        }
+
+        if (!audioSource.isPlaying)
+        {
+            audioSource.PlayOneShot(mainEngine);
+        }
+    }
+    private void StopThrusting()
+    {
+        audioSource.Stop();
+        mainBooster.Stop();
+    }
+        private void RotateLeft()
+    {
+        ApplyRotation(rotateSpeed);
+        if (!rightBooster.isPlaying)
+        {
+            rightBooster.Play();
+        }
+    }
+    private void RotateRight()
+    {
+        ApplyRotation(-rotateSpeed);
+        if (!leftBooster.isPlaying)
+        {
+            leftBooster.Play();
+        }
+    }
+    private void StopRotating()
+    {
+        rightBooster.Stop();
+        leftBooster.Stop();
+    }
+
     // Rotation simplified into a METHOD called ApplyRotation, can use this method in ProcessRotation to simplify code
     // float variable given to ApplyRotation as a placeholder
     // Can feed in additional variables to ApplyRotation so it can serve multiple purposes, in this case to multiply it by rotateSpeed (pos or neg)
@@ -93,4 +112,5 @@ public class Movement : MonoBehaviour
         transform.Rotate(Vector3.forward * (rotationThisFrame * Time.deltaTime));
         rb.freezeRotation = false; // unfreeze rotation so physics system can take over after movement input
     }
+
 }
